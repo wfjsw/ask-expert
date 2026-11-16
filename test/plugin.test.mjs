@@ -27,6 +27,7 @@ import {
 } from "../expert-tool.mjs";
 import plugin, {
   createHooks,
+  createModelsRefresher,
   modelsFilePath,
   renderModelsJs,
   writeModelsFile,
@@ -731,12 +732,21 @@ await test("refresh is skipped in external mode", async () => {
   }
 });
 
-await test("refresh swallows a dead gateway and writes an empty list", async () => {
+await test("a dead gateway never wipes a good list, and the next attempt retries at once", async () => {
   const f = await fixture();
   try {
-    await createHooks({}, {}, { ...f.deps, fetch: () => Promise.reject(new Error("dead")) });
-    await new Promise((r) => setTimeout(r, 200));
-    assert.match(await readFile(join(f.uiDir, "models.js"), "utf8"), /ASK_EXPERT_MODELS = \[\]/);
+    const file = join(f.uiDir, "models.js");
+    const good = 'globalThis.ASK_EXPERT_MODELS = [{"id":"keep/me","name":"Keep","reasoning":false,"levels":[]}];\nglobalThis.ASK_EXPERT_MODELS_AT = "x";\n';
+    await writeFile(file, good);
+    const dead = createModelsRefresher({ ...f.deps, readOptions: () => ({}), fetch: () => Promise.reject(new Error("dead")) });
+    assert.equal(await dead(false), "failed");
+    assert.equal(await readFile(file, "utf8"), good, "existing list kept");
+
+    // A failure does not start the 5-minute throttle: the next attempt (gateway up now) writes.
+    reset();
+    const alive = createModelsRefresher({ ...f.deps, readOptions: () => ({}) });
+    assert.equal(await alive(false), "written");
+    assert.match(await readFile(file, "utf8"), /expert\/hi/);
   } finally {
     await f.cleanup();
   }

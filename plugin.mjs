@@ -16,6 +16,7 @@ import { createGateway } from "./magpie.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REFRESH_MS = 5 * 60_000;
+const TICK_MS = 30_000; // retry cadence while the list has not loaded
 
 export function modelsFilePath(deps = {}) {
   if (deps.modelsFile) return deps.modelsFile;
@@ -73,8 +74,11 @@ export function createModelsRefresher(deps = {}) {
     if (running) return running;
     state.last = clock();
     running = (async () => {
-      // A dead gateway still gets an empty list written: better than a stale one.
+      // A gateway that is not up yet (the host loads plugins before Magpie serves
+      // it) or answers with no models must not wipe a good list: keep the file
+      // as it is and let the next tick retry instead of waiting out the throttle.
       const models = await gateway.listModels({ force: true }).catch(() => []);
+      if (!models.length) { state.last = 0; return "failed"; }
       return writeModelsFile(models, deps);
     })()
       .catch(() => "error")
@@ -98,7 +102,7 @@ export async function createHooks(input, options, deps = {}) {
 
   refresh(false); // detached: server() returns without waiting for the gateway
   // Keep the list fresh without needing a tool call (the panel only reads the file).
-  const timer = setInterval(() => { refresh(false); }, deps.refreshMs ?? REFRESH_MS);
+  const timer = setInterval(() => { refresh(false); }, deps.tickMs ?? TICK_MS);
   timer.unref?.();
 
   const tool = createTool(readOptions, {

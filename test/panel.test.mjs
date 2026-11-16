@@ -11,7 +11,13 @@ const uiDir = fileURLToPath(new URL("../ui/", import.meta.url));
 const htmlPath = path.join(uiDir, "settings.html");
 const html = fs.readFileSync(htmlPath, "utf8");
 const settingsJs = fs.readFileSync(path.join(uiDir, "settings.js"), "utf8");
-const modelsJs = fs.readFileSync(path.join(uiDir, "models.js"), "utf8");
+// models.js is written by the plugin host at runtime and is gitignored; on a fresh
+// clone, create the empty stub the panel is documented to cope with.
+const modelsPath = path.join(uiDir, "models.js");
+if (!fs.existsSync(modelsPath)) {
+  fs.writeFileSync(modelsPath, 'globalThis.ASK_EXPERT_MODELS = [];\nglobalThis.ASK_EXPERT_MODELS_AT = "";\n');
+}
+const modelsJs = fs.readFileSync(modelsPath, "utf8");
 const CUSTOM = "\u0000custom";
 
 let failures = 0;
