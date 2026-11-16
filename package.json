@@ -39,6 +39,14 @@
       "en": "Gives agents an ask_expert tool that consults a stronger Magpie model on hard problems. Pick the model in Settings > Plugins.",
       "zh": "给 agent 一个 ask_expert 工具：遇到难题时向更强的 Magpie 模型求助。在 设置 > 插件 里选模型。"
     },
+    "page": {
+      "title": "Ask Expert",
+      "titles": {
+        "zh": "求助专家"
+      },
+      "file": "ui/settings.html",
+      "icon": "ui/icon.svg"
+    },
     "panels": [
       {
         "slot": "settings",
