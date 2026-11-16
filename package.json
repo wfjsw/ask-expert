@@ -1,0 +1,76 @@
+{
+  "name": "ask-expert",
+  "version": "1.0.0",
+  "description": "ask_expert: consult a stronger LLM on hard problems. A stdio MCP server and a Magpie plugin (uses Magpie's own models; settings in Magpie's UI).",
+  "private": true,
+  "type": "module",
+  "main": "./plugin.mjs",
+  "exports": {
+    ".": "./plugin.mjs",
+    "./server": "./plugin.mjs",
+    "./mcp": "./server.mjs"
+  },
+  "bin": {
+    "ask-expert-mcp": "server.mjs"
+  },
+  "files": [
+    "plugin.mjs",
+    "expert-tool.mjs",
+    "magpie.mjs",
+    "core.mjs",
+    "server.mjs",
+    "ui",
+    "README.md"
+  ],
+  "keywords": [
+    "magpie",
+    "magpie-plugin",
+    "mcp",
+    "llm",
+    "expert"
+  ],
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node test/test.mjs && node test/plugin.test.mjs && node test/panel.test.mjs"
+  },
+  "magpie": {
+    "name": "Ask Expert",
+    "summary": {
+      "en": "Gives agents an ask_expert tool that consults a stronger Magpie model on hard problems. Pick the model in Settings > Plugins.",
+      "zh": "给 agent 一个 ask_expert 工具：遇到难题时向更强的 Magpie 模型求助。在 设置 > 插件 里选模型。"
+    },
+    "panels": [
+      {
+        "slot": "settings",
+        "file": "ui/settings.html",
+        "title": "Ask Expert",
+        "titles": {
+          "zh": "求助专家"
+        }
+      }
+    ],
+    "permissions": [],
+    "options": {
+      "model": "",
+      "modelLow": "",
+      "modelMedium": "",
+      "modelHigh": "",
+      "effort": "",
+      "effortLow": "",
+      "effortMedium": "",
+      "effortHigh": "",
+      "baseUrl": "",
+      "apiKey": "",
+      "timeout": 600,
+      "maxTokens": "",
+      "systemPrompt": ""
+    }
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}

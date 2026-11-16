@@ -1,0 +1,171 @@
+/* Ask Expert — settings panel.
+   Colours come only from magpie's tokens, with the same fallbacks the
+   shipped example page uses, so the panel sits on magpie's own background
+   and follows light/dark without a second palette. */
+:root {
+  --bg: var(--magpie-bg, #fff);
+  --card: var(--magpie-card, #f6f6f7);
+  --fg: var(--magpie-fg, #1d1d1f);
+  --muted: var(--magpie-muted, #6e6e73);
+  --faint: var(--magpie-faint, #b9b9c2);
+  --line: var(--magpie-line, #e5e5ea);
+  --accent: var(--magpie-accent, #4f46e5);
+  --font: var(--magpie-font, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif);
+  --mono: var(--magpie-code, ui-monospace, SFMono-Regular, Menlo, monospace);
+  --ok: #22a35a;
+  --warn: #c98a12;
+  --bad: #e0483c;
+  --radius: 7px;
+}
+/* fallbacks only bite when magpie's own tokens are missing; they still have
+   to be readable, so the dark scheme gets its own set */
+[data-theme="dark"] {
+  --bg: var(--magpie-bg, #1b1b1f);
+  --card: var(--magpie-card, #232327);
+  --fg: var(--magpie-fg, #ececf1);
+  --muted: var(--magpie-muted, #a2a2ad);
+  --faint: var(--magpie-faint, #4a4a53);
+  --line: var(--magpie-line, #34343c);
+  --accent: var(--magpie-accent, #8b8cf8);
+  --ok: #45c47b;
+  --warn: #e3ab3c;
+  --bad: #f2665b;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+/* the panel grows with its content: no height:100%, no inner scrollbar */
+html, body {
+  margin: 0;
+  height: auto;
+  background: transparent;
+  color: var(--fg);
+  font: 13px/1.45 var(--font);
+  -webkit-text-size-adjust: 100%;
+}
+body { padding: 16px 18px 20px; }
+.panel { display: flex; flex-direction: column; gap: 14px; max-width: 620px; }
+code { font: 12px/1.3 var(--mono); background: var(--card); border-radius: 4px; padding: 0 3px; }
+
+h1 { margin: 0 0 4px; font-size: 15px; font-weight: 650; letter-spacing: -0.01em; }
+.intro { margin: 0 0 8px; color: var(--muted); }
+
+.statusline { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; font-weight: 550; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+.dot.external { background: var(--warn); }
+.listinfo { margin: 0; color: var(--muted); font-size: 12px; }
+
+.sect {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+.sect:first-of-type { border-top: 0; padding-top: 2px; }
+.lbl { font-weight: 600; margin: 0; font-size: 13px; }
+h2.lbl { font-size: 13px; }
+.hint { margin: 0; color: var(--muted); font-size: 12px; }
+.sub { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; }
+.note { margin: 2px 0 0; color: var(--muted); font-size: 11.5px; }
+
+.field {
+  width: 100%; font: inherit; color: var(--fg);
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 6px 8px;
+}
+.field.mono { font-family: var(--mono); font-size: 12px; }
+.field.num { width: 110px; font-family: var(--mono); font-size: 12px; }
+.field.area { resize: vertical; min-height: 74px; line-height: 1.4; }
+.field:hover { border-color: var(--faint); }
+.field:focus-visible, summary:focus-visible, .link:focus-visible, input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+}
+.field:focus-visible { outline-offset: 0; }
+.field.invalid { border-color: var(--bad); }
+
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.row .rowlbl { flex: 1 1 160px; min-width: 130px; font-weight: 500; }
+.row .field { flex: 1 1 210px; width: auto; min-width: 120px; }
+.row.col { flex-direction: column; align-items: stretch; gap: 4px; }
+.row.col .rowlbl { flex: none; }
+.row.col .field { width: 100%; }
+.row.check { align-items: flex-start; flex-wrap: nowrap; }
+.row.check input { margin: 2px 0 0; flex: none; width: 14px; height: 14px; accent-color: var(--accent); }
+.row.check label { font-weight: 500; }
+.spread { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex: none; }
+.err { margin: 0; flex: 1 1 100%; color: var(--bad); font-size: 11.5px; }
+
+.advanced { gap: 10px; }
+.advanced > summary {
+  cursor: pointer; font-weight: 600; list-style: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.advanced > summary::-webkit-details-marker { display: none; }
+/* a plain sign: always renders, and stays legible at 11px */
+.advanced > summary::before {
+  content: "+"; color: var(--muted); font-size: 13px; line-height: 1; width: 9px; text-align: center;
+}
+.advanced[open] > summary::before { content: "−"; }
+
+.group {
+  margin: 4px 0 0; padding: 10px 12px 12px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.group legend { padding: 0 5px; font-weight: 600; font-size: 12px; }
+
+.link {
+  background: none; border: 0; padding: 0; font: inherit; font-size: 11.5px;
+  color: var(--accent); text-decoration: underline; cursor: pointer;
+}
+
+.foot { display: flex; justify-content: flex-end; min-height: 18px; }
+.save { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+.save[data-state="saving"] { color: var(--muted); }
+.save[data-state="saved"] { color: var(--ok); }
+.save[data-state="error"], .save[data-state="invalid"] { color: var(--bad); }
+.save[data-state="invalid"] { color: var(--warn); }
+
+/* ---------- dropdowns (look of magpie's own picker) ---------- */
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+/* the sections are columns, so no flex-basis here (it would become a height) */
+.fieldwrap { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fieldwrap.narrow { max-width: 420px; }
+.levelrow .fieldwrap { flex: 3 1 200px; min-width: 150px; }
+.levelrow .fieldwrap.effortcol { flex: 0 0 168px; min-width: 132px; }
+.picker { position: relative; }
+.pickbtn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 6px 8px;
+}
+.pickbtn.small { padding: 4px 7px; font-size: 12px; }
+.pickbtn:hover { border-color: var(--faint); }
+.pickbtn[aria-expanded="true"] { border-color: var(--accent); }
+.picker-val {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--mono); font-size: 12px;
+}
+.pickbtn:not(.small) .picker-val { color: var(--fg); }
+.chev { flex: none; color: var(--muted); }
+.picker-list {
+  position: fixed; z-index: 20; padding: 4px; overflow-y: auto;
+  min-width: 160px; max-height: 240px;
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: 0 10px 26px rgb(0 0 0 / 0.18);
+}
+[data-theme="dark"] .picker-list { background: var(--card); }
+.picker-opt {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: none; border: 0; border-radius: 5px; padding: 5px 8px;
+  font: inherit; font-size: 12px; color: inherit; text-align: left; cursor: pointer;
+}
+.picker-opt.active { background: var(--card); }
+[data-theme="dark"] .picker-opt.active { background: var(--line); }
+.picker-opt[aria-selected="true"] .picker-opt-label { color: var(--accent); }
+.picker-opt-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.optmark { flex: none; color: var(--muted); font-size: 10.5px; }
+.levelrow { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.levelrow .rowlbl { flex: 1 1 118px; min-width: 96px; font-weight: 500; padding-top: 3px; }

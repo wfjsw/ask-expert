@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Expert</title>
+<link rel="stylesheet" href="settings.css">
+<script src="_magpie/bridge.js"></script>
+<script src="models.js"></script>
+<script src="settings.js" defer></script>
+</head>
+<body>
+<main class="panel" id="panel">
+  <header class="head">
+    <h1 data-t="title">Ask Expert</h1>
+    <p class="intro"><code>ask_expert</code><span data-t="intro"></span></p>
+    <p class="statusline">
+      <span class="dot" id="modeDot" aria-hidden="true"></span>
+      <span id="modeText" data-t="modeMagpie">Using Magpie's models</span>
+    </p>
+    <p class="listinfo" id="listInfo" data-t="listPending">
+      The model list fills in after the plugin has run once with Magpie running. Any model id can be typed.
+    </p>
+  </header>
+
+  <section class="sect" aria-labelledby="modelLabel">
+    <label class="lbl" id="modelLabel" for="modelBtn" data-t="modelLabel">Expert model</label>
+    <p class="hint" data-t="modelHint">The model the expert tool asks. Pick from Magpie's list, or Custom… to type any model id (needed for an external endpoint).</p>
+    <div class="fieldwrap">
+      <div class="picker">
+        <button type="button" class="pickbtn" id="modelBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modelList" aria-labelledby="modelLabel modelBtn">
+          <span class="picker-val"></span>
+          <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="picker-list" id="modelList" role="listbox" aria-labelledby="modelLabel" tabindex="-1" hidden></div>
+      </div>
+      <input class="field mono custom" id="modelCustom" type="text" autocomplete="off" spellcheck="false"
+             aria-labelledby="modelCustomLabel" placeholder="group/model-id or auto/model-id" hidden>
+      <span class="sr" id="modelCustomLabel" data-t="customValue">Custom model id</span>
+    </div>
+  </section>
+
+  <section class="sect" aria-labelledby="effortLabel">
+    <label class="lbl" id="effortLabel" for="effortBtn" data-t="effortLabel">Reasoning effort</label>
+    <p class="hint" data-t="effortHint">Auto sends the difficulty the agent asked for. A fixed level sends that one instead. Off never sends reasoning effort.</p>
+    <div class="fieldwrap narrow">
+      <div class="picker">
+        <button type="button" class="pickbtn" id="effortBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="effortList" aria-labelledby="effortLabel effortBtn">
+          <span class="picker-val"></span>
+          <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="picker-list" id="effortList" role="listbox" aria-labelledby="effortLabel" tabindex="-1" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect" aria-labelledby="levelsLabel">
+    <h2 class="lbl" id="levelsLabel" data-t="levelsLabel">Model per difficulty level</h2>
+    <p class="hint" data-t="levelsHint">Optional. Left empty, a level uses the main model and effort; the effort list follows whichever model that level ends up using.</p>
+
+    <div class="levelrow">
+      <label class="rowlbl" for="modelLowBtn"><span data-t="levelLow">Low</span>
+        <span class="sub" data-t="levelLowSub">moderately tricky</span></label>
+      <div class="fieldwrap">
+        <div class="picker">
+          <button type="button" class="pickbtn small" id="modelLowBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modelLowList" aria-labelledby="modelLowLabel modelLowBtn">
+            <span class="picker-val"></span>
+            <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="sr" id="modelLowLabel" data-t="levelLow">Low</span>
+          <div class="picker-list" id="modelLowList" role="listbox" aria-labelledby="modelLowLabel" tabindex="-1" hidden></div>
+        </div>
+        <input class="field mono custom" id="modelLowCustom" type="text" autocomplete="off" spellcheck="false"
+               aria-label="Custom model id (low)" placeholder="model id" hidden>
+      </div>
+      <div class="fieldwrap effortcol">
+        <div class="picker">
+          <button type="button" class="pickbtn small" id="effortLowBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="effortLowList" aria-labelledby="effortLowLabel effortLowBtn">
+            <span class="picker-val"></span>
+            <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="sr" id="effortLowLabel" data-t="effortShort">effort</span>
+          <div class="picker-list" id="effortLowList" role="listbox" aria-labelledby="effortLowLabel" tabindex="-1" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="levelrow">
+      <label class="rowlbl" for="modelMediumBtn"><span data-t="levelMedium">Medium</span>
+        <span class="sub" data-t="levelMediumSub">hard</span></label>
+      <div class="fieldwrap">
+        <div class="picker">
+          <button type="button" class="pickbtn small" id="modelMediumBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modelMediumList" aria-labelledby="modelMediumLabel modelMediumBtn">
+            <span class="picker-val"></span>
+            <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="sr" id="modelMediumLabel" data-t="levelMedium">Medium</span>
+          <div class="picker-list" id="modelMediumList" role="listbox" aria-labelledby="modelMediumLabel" tabindex="-1" hidden></div>
+        </div>
+        <input class="field mono custom" id="modelMediumCustom" type="text" autocomplete="off" spellcheck="false"
+               aria-label="Custom model id (medium)" placeholder="model id" hidden>
+      </div>
+      <div class="fieldwrap effortcol">
+        <div class="picker">
+          <button type="button" class="pickbtn small" id="effortMediumBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="effortMediumList" aria-labelledby="effortMediumLabel effortMediumBtn">
+            <span class="picker-val"></span>
+            <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="sr" id="effortMediumLabel" data-t="effortShort">effort</span>
+          <div class="picker-list" id="effortMediumList" role="listbox" aria-labelledby="effortMediumLabel" tabindex="-1" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="levelrow">
+      <label class="rowlbl" for="modelHighBtn"><span data-t="levelHigh">High</span>
+        <span class="sub" data-t="levelHighSub">very hard</span></label>
+      <div class="fieldwrap">
+        <div class="picker">
+          <button type="button" class="pickbtn small" id="modelHighBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modelHighList" aria-labelledby="modelHighLabel modelHighBtn">
+            <span class="picker-val"></span>
+            <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="sr" id="modelHighLabel" data-t="levelHigh">High</span>
+          <div class="picker-list" id="modelHighList" role="listbox" aria-labelledby="modelHighLabel" tabindex="-1" hidden></div>
+        </div>
+        <input class="field mono custom" id="modelHighCustom" type="text" autocomplete="off" spellcheck="false"
+               aria-label="Custom model id (high)" placeholder="model id" hidden>
+      </div>
+      <div class="fieldwrap effortcol">
+        <div class="picker">
+          <button type="button" class="pickbtn small" id="effortHighBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="effortHighList" aria-labelledby="effortHighLabel effortHighBtn">
+            <span class="picker-val"></span>
+            <svg class="chev" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1.25 1.25L5 4.75L8.75 1.25" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="sr" id="effortHighLabel" data-t="effortShort">effort</span>
+          <div class="picker-list" id="effortHighList" role="listbox" aria-labelledby="effortHighLabel" tabindex="-1" hidden></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <details class="sect advanced" id="advanced">
+    <summary data-t="advanced">Advanced</summary>
+
+    <div class="row">
+      <label class="rowlbl" for="timeout"><span data-t="timeoutLabel">Timeout</span>
+        <span class="sub" data-t="timeoutHint">seconds, at least 1</span></label>
+      <input class="field num" id="timeout" type="number" min="1" step="1" inputmode="numeric" value="600"
+             aria-describedby="timeoutErr">
+      <p class="err" id="timeoutErr" role="alert" hidden data-t="timeoutErr">Enter a positive number of seconds.</p>
+    </div>
+
+    <div class="row">
+      <label class="rowlbl" for="maxTokens"><span data-t="maxTokensLabel">Max answer tokens</span>
+        <span class="sub" data-t="maxTokensHint">blank = the provider's default</span></label>
+      <input class="field num" id="maxTokens" type="number" min="1" step="1" inputmode="numeric" value=""
+             aria-describedby="maxTokensErr">
+      <p class="err" id="maxTokensErr" role="alert" hidden data-t="maxTokensErr">Enter a positive integer, or leave it blank.</p>
+    </div>
+
+    <div class="row col">
+      <div class="rowlbl spread">
+        <label for="systemPrompt" data-t="systemLabel">System prompt</label>
+        <button type="button" class="link" id="resetPrompt" aria-labelledby="systemLabel resetPrompt" data-t="reset">Reset</button>
+      </div>
+      <span class="sub" data-t="systemHint">blank = the built-in default</span>
+      <textarea class="field area mono" id="systemPrompt" rows="5" spellcheck="false"
+                data-t-placeholder="systemPlaceholder" placeholder="built-in default"></textarea>
+    </div>
+
+    <fieldset class="group">
+      <legend data-t="external">External endpoint</legend>
+      <p class="hint" data-t="externalHint">Leave the base URL blank to use Magpie's own gateway. With a URL the expert calls that OpenAI-compatible endpoint instead.</p>
+
+      <div class="row">
+        <label class="rowlbl" for="baseUrl"><span data-t="baseUrlLabel">Base URL</span>
+          <span class="sub" data-t="baseUrlHint">blank = use Magpie; ends in /v1</span></label>
+        <input class="field mono" id="baseUrl" type="text" autocomplete="off" spellcheck="false"
+               placeholder="https://host/v1" aria-describedby="baseUrlErr">
+        <p class="err" id="baseUrlErr" role="alert" hidden data-t="baseUrlErr">Must start with http:// or https://, or be blank.</p>
+      </div>
+
+      <div class="row">
+        <label class="rowlbl" for="apiKey"><span data-t="apiKeyLabel">API key</span>
+          <span class="sub" data-t="apiKeyHint">ignored in Magpie mode</span></label>
+        <input class="field mono" id="apiKey" type="password" autocomplete="off" spellcheck="false"
+               aria-describedby="apiKeyNote">
+      </div>
+      <p class="note" id="apiKeyNote" data-t="apiKeyNote">Stored in Magpie's plugin options in plain text.</p>
+    </fieldset>
+  </details>
+
+  <footer class="foot">
+    <span class="save" id="save" aria-live="polite">
+      <span class="savetext" id="saveText"></span>
+    </span>
+  </footer>
+</main>
+</body>
+</html>
