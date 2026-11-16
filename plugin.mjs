@@ -97,6 +97,9 @@ export async function createHooks(input, options, deps = {}) {
   const refresh = createModelsRefresher({ ...deps, readOptions });
 
   refresh(false); // detached: server() returns without waiting for the gateway
+  // Keep the list fresh without needing a tool call (the panel only reads the file).
+  const timer = setInterval(() => { refresh(false); }, deps.refreshMs ?? REFRESH_MS);
+  timer.unref?.();
 
   const tool = createTool(readOptions, {
     ...deps,
